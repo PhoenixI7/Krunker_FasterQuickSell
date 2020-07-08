@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Krunker Market Quick Sell
 // @namespace    http://tampermonkey.net/
-// @version      v1.2
+// @version      v1.1.0
 // @description  Script for faster quick selling!
 // @author       Phoenixi7
 // @match        https://krunker.io/social.html?p=market
@@ -16,7 +16,7 @@
     let excludedNames = ['Fabrica', 'Lumus', 'Sugarbear', 'Suede Blade', 'Phase Blases', 'Urban Soldier']; /* Capitalize First Letter, Ex. ['Sugarbear', 'Suede Blade'] */
 
     document.addEventListener('keydown', (event) => {
-        if (event.key == "1") {
+        if (event.key == "@") {
             let itemsString = document.getElementById('invTrack').innerHTML.split('<')[0];
             let itemsInt = parseInt(itemsString);
             promptOptions(itemsInt + 10); //add 10 bc sometimes krunker item numbers are more than invTrack
