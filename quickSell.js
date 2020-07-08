@@ -14,7 +14,7 @@
 
     /* <--------------------- Excluded Items ---------------------> */
     let excludedRarity = ['contraband', 'relic', 'legendary']; /* Possible Rarities, ['contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon"] */
-    let excludedNames = ['Fabrica', 'Lumus', 'Sugarbear', 'Suede Blade', 'Phase Blases', 'Urban Soldier']; /* Capitalize First Letter, Ex. ['Sugarbear', 'Suede Blade'] */
+    let excludedNames = []; /* Capitalize First Letter, Ex. ['Sugarbear', 'Suede Blade'] */
 
     document.addEventListener('keydown', (event) => {
         if (event.key == "@") {
