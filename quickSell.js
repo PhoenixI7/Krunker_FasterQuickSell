@@ -42,7 +42,7 @@
         return new Promise(res => setTimeout(res, ms));
     }
 
-    function excluded(array) {
+    function isExcluded(array) {
         if (excludedRarity.includes(array[1]) || excludedNames.includes(array[0])) {
             return true;
         } else { return false; }
@@ -75,7 +75,7 @@
         var itemsSold = 0;
         for (let i = items; i >= 0; i--) {
             if (document.getElementById('itemCardinventory_' + i)) {
-                if (!excluded(getItemInfo(i)) && itemsSold >= 1) {
+                if (!isExcluded(getItemInfo(i)) && itemsSold >= 1) {
                     await sellItem(i, 20);
                     while (true) {
                         if (document.getElementById('popupContent').querySelector('div').querySelector('div').className != "lds-ring") {
@@ -96,7 +96,7 @@
         for (let i = 0; i <= items; i++) {
             if (document.getElementById('itemCardinventory_' + i)) {
                 const itemInfo = getItemInfo(i);
-                if (!excluded(itemInfo)) {
+                if (!isExcluded(itemInfo)) {
                     let confirmSell = confirm("Sell " + itemInfo[0] + ", it is " + itemInfo[1]);
                     if (confirmSell && itemsSold >= 1) {
                         await sellItem(i, 20);
