@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         Krunker Market Quick Sell
 // @namespace    http://tampermonkey.net/
-// @version      v1.1.0
+// @version      v1.1.2
 // @description  Script for faster quick selling!
 // @author       Phoenixi7
+// @iconURL      https://phoenixpwn.com/phoenix.png
 // @match        https://krunker.io/social.html?p=market
 // @grant        none
 // ==/UserScript==
@@ -16,7 +17,7 @@
     let excludedNames = ['Fabrica', 'Lumus', 'Sugarbear', 'Suede Blade', 'Phase Blases', 'Urban Soldier']; /* Capitalize First Letter, Ex. ['Sugarbear', 'Suede Blade'] */
 
     document.addEventListener('keydown', (event) => {
-        if (event.key == "@") {
+        if (event.key == "1") {
             let itemsString = document.getElementById('invTrack').innerHTML.split('<')[0];
             let itemsInt = parseInt(itemsString);
             promptOptions(itemsInt + 10); //add 10 bc sometimes krunker item numbers are more than invTrack
@@ -24,7 +25,7 @@
     });
 
     function promptOptions(items) {
-        let input = prompt('To sell all type "ALL"...\nTo go one at a time type "ONE"...\nTo exit type "EXIT"...');
+        let input = prompt('To sell all type "ALL"...\nTo go one item at a time type "ONE"...\nTo exit type "EXIT"...');
         if (input == "ALL") {
             const check = confirm('Are you sure you want to quick sell everything?');
             if (check) {
@@ -34,9 +35,7 @@
             quickSell(items);
         } else if (input == "EXIT") {
             alert("!Script Aborted!");
-        } else {
-            promptOptions(items);
-        }
+        } else { promptOptions(items); }
     }
 
     function timer(ms) {
@@ -46,9 +45,7 @@
     function excluded(array) {
         if (excludedRarity.includes(array[1]) || excludedNames.includes(array[0])) {
             return true;
-        } else {
-            return false;
-        }
+        } else { return false; }
     }
 
     async function sellItem(itemNumber, ms) {
@@ -105,8 +102,8 @@
     }
 
     function getItemInfo(itemNumber) {
-        let itemName = document.getElementById('itemCardinventory_' + itemNumber).innerHTML.split('<')[0]
-        const rarity = howRare(itemNumber)
+        let itemName = document.getElementById('itemCardinventory_' + itemNumber).innerHTML.split('<')[0];
+        const rarity = howRare(itemNumber);
         const info = [itemName, rarity[0], rarity[1], rarity[2]]; // Ex. ["Sugarbear", "relic", "rgb(237, 66, 66)", 6]
         return info;
     }
@@ -117,9 +114,7 @@
         for (let i = 0; i < rarities.length; i++) {
             let itemColor = document.getElementById('itemCardinventory_' + itemNumber).style.color;
             const rarityInfo = [rarities[i], itemColor, itemNumber]; // Ex. ["relic", "rgb(237, 66, 66)", 6]
-            if (itemColor == colors[i]) {
-                return rarityInfo;
-            }
+            if (itemColor == colors[i]) { return rarityInfo; }
         }
     }
 })();
