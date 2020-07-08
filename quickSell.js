@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Krunker Market Quick Sell
 // @namespace    http://tampermonkey.net/
-// @version      v1.1
+// @version      v1.2
 // @description  Script for faster quick selling!
 // @author       Phoenixi7
 // @match        https://krunker.io/social.html?p=market
@@ -27,7 +27,7 @@
         let input = prompt('To sell all type "ALL"...\nTo go one at a time type "ONE"...\nTo exit type "EXIT"...');
         if (input == "ALL") {
             const check = confirm('Are you sure you want to quick sell everything?');
-            if (check == "YES") {
+            if (check) {
                 quickSellAll(items);
             } else { promptOptions(items); }
         } else if (input == "ONE") {
@@ -51,28 +51,54 @@
         }
     }
 
-    async function sellItem(itemNumber) {
+    async function sellItem(itemNumber, ms) {
         document.getElementById('itemCardinventory_' + itemNumber).querySelector('.cardActions').getElementsByClassName('cardAction')[1].click();
         document.getElementById('confirmBtn').click();
-        await timer(200);
+        await timer(ms);
     }
 
     async function quickSellAll(items) {
-        for (let i = items; i > 0; i--) {
+        var itemsSold = 0;
+        for (let i = items; i >= 0; i--) {
             if (document.getElementById('itemCardinventory_' + i)) {
                 const itemInfo = getItemInfo(i);
-                if (!excluded(itemInfo)) { await sellItem(i); }
+                if (!excluded(itemInfo)) {
+                    if (itemsSold >= 1) {
+                        await sellItem(i, 20);
+                        while (true) {
+                            if (document.getElementById('popupContent').querySelector('div').querySelector('div').className != "lds-ring") {
+                                timer(20);
+                                break;
+                            } else { await timer(20); }
+                        }
+                    } else if (itemsSold == 0) {
+                        itemsSold++
+                        await sellItem(i, 250);
+                    }
+                }
             }
         } alert("DONE!");
     }
 
     async function quickSell(items) {
-        for (let i = items; i > 0; i--) {
+        var itemsSold = 0;
+        for (let i = 0; i <= items; i++) {
             if (document.getElementById('itemCardinventory_' + i)) {
                 const itemInfo = getItemInfo(i);
                 if (!excluded(itemInfo)) {
                     let confirmSell = confirm("Sell " + itemInfo[0] + ", it is " + itemInfo[1]);
-                    if (confirmSell) { await sellItem(i); }
+                    if (confirmSell && itemsSold >= 1) {
+                        await sellItem(i, 20);
+                        while (true) {
+                            if (document.getElementById('popupContent').querySelector('div').querySelector('div').className != "lds-ring") {
+                                timer(20);
+                                break;
+                            } else { await timer(20); }
+                        }
+                    } else if (confirmSell && itemsSold == 0) {
+                        itemsSold++
+                        await sellItem(i, 250);
+                    }
                 }
             }
         } alert("DONE!");
