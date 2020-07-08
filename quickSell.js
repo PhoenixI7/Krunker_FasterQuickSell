@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Krunker Market Quick Sell
 // @namespace    http://tampermonkey.net/
-// @version      v1.1.2
+// @version      v1.1.3
 // @description  Script for faster quick selling!
 // @author       Phoenixi7
 // @iconURL      https://phoenixpwn.com/phoenix.png
@@ -13,7 +13,7 @@
     'use strict';
 
     /* <--------------------- Excluded Items ---------------------> */
-    let excludedRarity = ['contraband', 'relic', 'legendary']; /* Possible Rarities, ['contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon"] */
+    let excludedRarity = ['contraband', 'relic']; /* Possible Rarities, ['contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon"] */
     let excludedNames = []; /* Capitalize First Letter, Ex. ['Sugarbear', 'Suede Blade'] */
 
     document.addEventListener('keydown', (event) => {
@@ -48,6 +48,23 @@
         } else { return false; }
     }
 
+    function getItemInfo(itemNumber) {
+        let itemName = document.getElementById('itemCardinventory_' + itemNumber).innerHTML.split('<')[0];
+        const rarity = howRare(itemNumber);
+        const info = [itemName, rarity[0], rarity[1], rarity[2]]; // Ex. ["Sugarbear", "relic", "rgb(237, 66, 66)", 6]
+        return info;
+    }
+
+    function howRare(itemNumber) {
+        let colors = ["rgb(41, 41, 41)", "rgb(237, 66, 66)", "rgb(251, 192, 45)", "rgb(224, 64, 251)", "rgb(33, 150, 243)", "rgb(178, 242, 82)"];
+        let rarities = ['contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon"];
+        for (let i = 0; i < rarities.length; i++) {
+            let itemColor = document.getElementById('itemCardinventory_' + itemNumber).style.color;
+            const rarityInfo = [rarities[i], itemColor, itemNumber]; // Ex. ["relic", "rgb(237, 66, 66)", 6]
+            if (itemColor == colors[i]) { return rarityInfo; }
+        }
+    }
+
     async function sellItem(itemNumber, ms) {
         document.getElementById('itemCardinventory_' + itemNumber).querySelector('.cardActions').getElementsByClassName('cardAction')[1].click();
         document.getElementById('confirmBtn').click();
@@ -58,20 +75,17 @@
         var itemsSold = 0;
         for (let i = items; i >= 0; i--) {
             if (document.getElementById('itemCardinventory_' + i)) {
-                const itemInfo = getItemInfo(i);
-                if (!excluded(itemInfo)) {
-                    if (itemsSold >= 1) {
-                        await sellItem(i, 20);
-                        while (true) {
-                            if (document.getElementById('popupContent').querySelector('div').querySelector('div').className != "lds-ring") {
-                                timer(20);
-                                break;
-                            } else { await timer(20); }
-                        }
-                    } else if (itemsSold == 0) {
-                        itemsSold++
-                        await sellItem(i, 250);
+                if (!excluded(getItemInfo(i)) && itemsSold >= 1) {
+                    await sellItem(i, 20);
+                    while (true) {
+                        if (document.getElementById('popupContent').querySelector('div').querySelector('div').className != "lds-ring") {
+                            timer(20);
+                            break;
+                        } else { await timer(20); }
                     }
+                } else if (itemsSold == 0) {
+                    itemsSold++
+                    await sellItem(i, 250);
                 }
             }
         } alert("DONE!");
@@ -99,22 +113,5 @@
                 }
             }
         } alert("DONE!");
-    }
-
-    function getItemInfo(itemNumber) {
-        let itemName = document.getElementById('itemCardinventory_' + itemNumber).innerHTML.split('<')[0];
-        const rarity = howRare(itemNumber);
-        const info = [itemName, rarity[0], rarity[1], rarity[2]]; // Ex. ["Sugarbear", "relic", "rgb(237, 66, 66)", 6]
-        return info;
-    }
-
-    function howRare(itemNumber) {
-        let colors = ["rgb(41, 41, 41)", "rgb(237, 66, 66)", "rgb(251, 192, 45)", "rgb(224, 64, 251)", "rgb(33, 150, 243)", "rgb(178, 242, 82)"];
-        let rarities = ['contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon"];
-        for (let i = 0; i < rarities.length; i++) {
-            let itemColor = document.getElementById('itemCardinventory_' + itemNumber).style.color;
-            const rarityInfo = [rarities[i], itemColor, itemNumber]; // Ex. ["relic", "rgb(237, 66, 66)", 6]
-            if (itemColor == colors[i]) { return rarityInfo; }
-        }
     }
 })();
