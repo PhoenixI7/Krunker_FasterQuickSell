@@ -12,17 +12,21 @@
 (function() {
     'use strict';
 
+
     /* <--------------------- Excluded Items ---------------------> */
-    // **Always Include "excluded'**, Possible Rarities, ['excluded', 'contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon"]
-    let excludedRarity = ['excluded', 'contraband', 'relic'];
-    // Copy Exactly, Ex. ['Sugarbear', 'Suede Blade']
-    let excludedNames = []; 
+        // **Always Include "excluded'**, Possible Rarities, ['excluded', 'contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon"]
+        let excludedRarity = ['excluded', 'contraband', 'relic'];
+        // Copy Exactly, Ex. ['Sugarbear', 'Suede Blade']
+        let excludedNames = [];
+    /* <--------------------- Excluded Items ---------------------> */
+
+
     const excludedNamesA1 = [];
     const excludedNamesA1ItemColors = [];
     const twitchItems = ['TTV', 'tRaDes?', 'Partner Push', 'Zed', 'Kaarson', 'TTV-Cap', 'Twitched', 'TTV Vest', 'TTV Tron', 'Krunk TTV', 'Streamer', 'Stream Suit', 'TTV Cape', "Mic'd Up", 'Cheerful', 'Twitcher', 'Just Vibing', 'USS TTV', 'Bits'];
 
     document.addEventListener('keydown', (event) => {
-        if (event.key == "1") {
+        if (event.key == "@") {
             let itemsString = document.getElementById('invTrack').innerHTML.split('<')[0];
             let itemsInt = parseInt(itemsString);
             let items = itemsInt + 50;
@@ -70,6 +74,7 @@
         console.log('sucsess' + id);
         document.getElementById('itemCardinventory_' + id).style.color = 'green';
         document.getElementById('itemCardinventory_' + id).style.border = "5px solid green";
+        document.getElementById('itemCardinventory_' + id).querySelector('.cardActions').getElementsByClassName('cardAction')[2].innerHTML = "Include"
         setUncheck(id);
     }
 
@@ -78,6 +83,7 @@
         const index = excludedNamesA1.indexOf(itemName);
         document.getElementById('itemCardinventory_' + id).style.color = excludedNamesA1ItemColors[index];
         document.getElementById('itemCardinventory_' + id).style.border = "5px solid " + excludedNamesA1ItemColors[index];
+        document.getElementById('itemCardinventory_' + id).querySelector('.cardActions').getElementsByClassName('cardAction')[2].innerHTML = "Exclude"
         if (index > -1) {
             excludedNamesA1.splice(index, 1);
             excludedNamesA1ItemColors.splice(index, 1);
