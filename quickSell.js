@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Krunker Market Quick Sell
 // @namespace    http://tampermonkey.net/
-// @version      v2.1.1
+// @version      v2.2.0
 // @description  Script for faster quick selling!
 // @author       Phoenixi7
 // @iconURL      https://phoenixpwn.com/phoenix.png
@@ -50,15 +50,11 @@
             //Create Selection
             for (let i = 0; i < 1000; i++) {
                 if (document.getElementById('itemCardinventory_' + i)) {
-                    if (isExcluded(getItemInfo(i))) {
-                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[0].innerHTML = "Excluded";
-                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[1].innerHTML = "In";
-                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[2].innerHTML = "Code";
-                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[0].onclick = function() { console.log('Excluded') };
-                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[1].onclick = function() { console.log('Excluded') };
-                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[2].onclick = function() { console.log('Excluded') };
-                        document.getElementById('itemCardinventory_' + i).style.color = 'green';
-                        document.getElementById('itemCardinventory_' + i).style.border = "5px solid green";
+                    let excludedVal = isExcluded(getItemInfo(i));
+                    if (excludedVal == true) {
+                        exclude_ui(i, "Excluded", "In", "Code");
+                    } else if (excludedVal == 'cannot be sold') {
+                        exclude_ui(i, "Can't", "Be", "Sold");
                     } else {
                         document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[2].innerHTML = "Exclude"
                         document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[2].onclick = function() { addToArray(i) };
@@ -68,10 +64,24 @@
         }
     });
 
+    function exclude_ui(i, a, b, c) {
+        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[0].innerHTML = a;
+        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[1].innerHTML = b;
+        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[2].innerHTML = c;
+        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[0].onclick = function() { console.log('Excluded') };
+        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[1].onclick = function() { console.log('Excluded') };
+        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[2].onclick = function() { console.log('Excluded') };
+        document.getElementById('itemCardinventory_' + i).style.color = 'green';
+        document.getElementById('itemCardinventory_' + i).style.border = "5px solid green";
+    }
+
     function addToArray(id) {
         let itemName = document.getElementById('itemCardinventory_' + id).innerHTML.split('<')[0];
         excludedNamesA1.push(itemName);
         excludedNamesA1ItemColors.push(document.getElementById('itemCardinventory_' + id).style.color);
+        console.log(excludedNamesA1);
+        console.log(excludedNamesA1ItemColors);
+        console.log('sucsess' + id);
         document.getElementById('itemCardinventory_' + id).style.color = 'green';
         document.getElementById('itemCardinventory_' + id).style.border = "5px solid green";
         document.getElementById('itemCardinventory_' + id).querySelector('.cardActions').getElementsByClassName('cardAction')[2].innerHTML = "Include"
@@ -104,7 +114,9 @@
     }
 
     function isExcluded(array) {
-        if (excludedRarity.includes(array[1]) || excludedNames.includes(array[0]) || excludedNamesA1.includes(array[0]) || twitchItems.includes(array[0]) || blackMarket.includes(array[0])) {
+        if (twitchItems.includes(array[0]) || blackMarket.includes(array[0])) {
+            return 'cannot be sold'
+        } else if (excludedRarity.includes(array[1]) || excludedNames.includes(array[0]) || excludedNamesA1.includes(array[0])) {
             return true;
         } else { return false; }
     }
@@ -136,7 +148,7 @@
         var itemsSold = 0;
         for (let i = items; i >= 0; i--) {
             if (document.getElementById('itemCardinventory_' + i)) {
-                if (!isExcluded(getItemInfo(i)) && itemsSold >= 1) {
+                if (isExcluded(getItemInfo(i)) == false && itemsSold >= 1) {
                     await sellItem(i, 20);
                     while (true) {
                         if (document.getElementById('popupContent').querySelector('div').querySelector('div').className != "lds-ring") {
@@ -149,7 +161,9 @@
                     await sellItem(i, 250);
                 }
             }
-        } alert("DONE! Please Reload");
+        } alert("DONE! Reloading Page");
+        await timer(20);
+        location.reload();
     }
 
     async function quickSell(items) {
@@ -157,7 +171,7 @@
         for (let i = 0; i <= items; i++) {
             if (document.getElementById('itemCardinventory_' + i)) {
                 const itemInfo = getItemInfo(i);
-                if (!isExcluded(itemInfo)) {
+                if (isExcluded(itemInfo) == false) {
                     document.getElementById('itemCardinventory_' + i).style.color = 'crimson';
                     document.getElementById('itemCardinventory_' + i).style.border = "5px solid crimson";
                     await timer(20);
@@ -179,6 +193,8 @@
                     }
                 }
             }
-        } alert("DONE! Please Reload");
+        } alert("DONE! Reloading Page");
+        await timer(20);
+        location.reload();
     }
 })();
