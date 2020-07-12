@@ -72,9 +72,6 @@
         let itemName = document.getElementById('itemCardinventory_' + id).innerHTML.split('<')[0];
         excludedNamesA1.push(itemName);
         excludedNamesA1ItemColors.push(document.getElementById('itemCardinventory_' + id).style.color);
-        console.log(excludedNamesA1);
-        console.log(excludedNamesA1ItemColors);
-        console.log('sucsess' + id);
         document.getElementById('itemCardinventory_' + id).style.color = 'green';
         document.getElementById('itemCardinventory_' + id).style.border = "5px solid green";
         document.getElementById('itemCardinventory_' + id).querySelector('.cardActions').getElementsByClassName('cardAction')[2].innerHTML = "Include"
