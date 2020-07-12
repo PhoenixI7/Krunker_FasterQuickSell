@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Krunker Market Quick Sell
 // @namespace    http://tampermonkey.net/
-// @version      v2.0.1 beta
+// @version      v2.1.1
 // @description  Script for faster quick selling!
 // @author       Phoenixi7
 // @iconURL      https://phoenixpwn.com/phoenix.png
@@ -20,10 +20,13 @@
         let excludedNames = [];
     /* <--------------------- Excluded Items ---------------------> */
 
+    /* <--------- Always Exclude ---------> */
+    const twitchItems = ['TTV', 'tRaDes?', 'Partner Push', 'Zed', 'Kaarson', 'TTV-Cap', 'Twitched', 'TTV Vest', 'TTV Tron', 'Krunk TTV', 'Streamer', 'Stream Suit', 'TTV Cape', "Mic'd Up", 'Cheerful', 'Twitcher', 'Just Vibing', 'USS TTV', 'Bits'];
+    const blackMarket = ['1 Year Cape', '2 Year Cape', 'Puppet Master', 'Nuke Tamer', 'Antidote XVI', 'USS Krunk'];
+    /* <--------- Always Exclude ---------> */
 
     const excludedNamesA1 = [];
     const excludedNamesA1ItemColors = [];
-    const twitchItems = ['TTV', 'tRaDes?', 'Partner Push', 'Zed', 'Kaarson', 'TTV-Cap', 'Twitched', 'TTV Vest', 'TTV Tron', 'Krunk TTV', 'Streamer', 'Stream Suit', 'TTV Cape', "Mic'd Up", 'Cheerful', 'Twitcher', 'Just Vibing', 'USS TTV', 'Bits'];
 
     document.addEventListener('keydown', (event) => {
         if (event.key == "@") {
@@ -45,7 +48,7 @@
             document.getElementById('m_trades').onclick = function() { quickSellAll(items); };
 
             //Create Selection
-            for (let i = 0; i < 2000; i++) {
+            for (let i = 0; i < 1000; i++) {
                 if (document.getElementById('itemCardinventory_' + i)) {
                     if (isExcluded(getItemInfo(i))) {
                         document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[0].innerHTML = "Excluded";
@@ -69,6 +72,9 @@
         let itemName = document.getElementById('itemCardinventory_' + id).innerHTML.split('<')[0];
         excludedNamesA1.push(itemName);
         excludedNamesA1ItemColors.push(document.getElementById('itemCardinventory_' + id).style.color);
+        console.log(excludedNamesA1);
+        console.log(excludedNamesA1ItemColors);
+        console.log('sucsess' + id);
         document.getElementById('itemCardinventory_' + id).style.color = 'green';
         document.getElementById('itemCardinventory_' + id).style.border = "5px solid green";
         document.getElementById('itemCardinventory_' + id).querySelector('.cardActions').getElementsByClassName('cardAction')[2].innerHTML = "Include"
@@ -101,7 +107,7 @@
     }
 
     function isExcluded(array) {
-        if (excludedRarity.includes(array[1]) || excludedNames.includes(array[0]) || excludedNamesA1.includes(array[0]) || twitchItems.includes(array[0])) {
+        if (excludedRarity.includes(array[1]) || excludedNames.includes(array[0]) || excludedNamesA1.includes(array[0]) || twitchItems.includes(array[0]) || blackMarket.includes(array[0])) {
             return true;
         } else { return false; }
     }
