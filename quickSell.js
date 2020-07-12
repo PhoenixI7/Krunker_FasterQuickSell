@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Krunker Market Quick Sell
 // @namespace    http://tampermonkey.net/
-// @version      v1.1.3
+// @version      v2.0.1 beta
 // @description  Script for faster quick selling!
 // @author       Phoenixi7
 // @iconURL      https://phoenixpwn.com/phoenix.png
@@ -13,29 +13,84 @@
     'use strict';
 
     /* <--------------------- Excluded Items ---------------------> */
-    let excludedRarity = ['contraband', 'relic', 'legendary']; /* Possible Rarities, ['contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon"] */
-    let excludedNames = []; /* Capitalize First Letter, Ex. ['Sugarbear', 'Suede Blade'] */
+    // **Always Include "excluded'**, Possible Rarities, ['excluded', 'contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon"]
+    let excludedRarity = ['excluded', 'contraband', 'relic'];
+    // Copy Exactly, Ex. ['Sugarbear', 'Suede Blade']
+    let excludedNames = []; 
+    const excludedNamesA1 = [];
+    const excludedNamesA1ItemColors = [];
+    const twitchItems = ['TTV', 'tRaDes?', 'Partner Push', 'Zed', 'Kaarson', 'TTV-Cap', 'Twitched', 'TTV Vest', 'TTV Tron', 'Krunk TTV', 'Streamer', 'Stream Suit', 'TTV Cape', "Mic'd Up", 'Cheerful', 'Twitcher', 'Just Vibing', 'USS TTV', 'Bits'];
 
     document.addEventListener('keydown', (event) => {
-        if (event.key == "@") {
+        if (event.key == "1") {
             let itemsString = document.getElementById('invTrack').innerHTML.split('<')[0];
             let itemsInt = parseInt(itemsString);
-            promptOptions(itemsInt + 10); //add 10 bc sometimes krunker item numbers are more than invTrack
+            let items = itemsInt + 50;
+
+            //Edit Buttons
+            document.getElementById('invTrack').style.display = "none"
+            document.getElementById('m_stats').remove();
+            document.getElementById('m_sales').remove();
+            document.getElementById('invSortB').remove();
+            document.getElementById('invValue').remove();
+            document.getElementById('m_market').innerHTML = "Quick Sell";
+            document.getElementById('m_market').onclick = function() { quickSell(items); };
+            document.getElementById('m_inventory').innerHTML = "Krunker Faster Quick Sell";
+            document.getElementById('m_inventory').onclick = function() { console.log('null') };
+            document.getElementById('m_trades').innerHTML = "Quick Sell All";
+            document.getElementById('m_trades').onclick = function() { quickSellAll(items); };
+
+            //Create Selection
+            for (let i = 0; i < 1000; i++) {
+                if (document.getElementById('itemCardinventory_' + i)) {
+                    if (isExcluded(getItemInfo(i))) {
+                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[0].innerHTML = "Excluded";
+                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[1].innerHTML = "In";
+                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[2].innerHTML = "Code";
+                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[0].onclick = function() { console.log('Excluded') };
+                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[1].onclick = function() { console.log('Excluded') };
+                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[2].onclick = function() { console.log('Excluded') };
+                        document.getElementById('itemCardinventory_' + i).style.color = 'green';
+                        document.getElementById('itemCardinventory_' + i).style.border = "5px solid green";
+                    } else {
+                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[2].innerHTML = "Exclude"
+                        document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[2].onclick = function() { addToArray(i) };
+                    }
+                }
+            }
         }
     });
 
-    function promptOptions(items) {
-        let input = prompt('To sell all type "ALL"...\nTo go one item at a time type "ONE"...\nTo exit type "EXIT"...');
-        if (input == "ALL") {
-            const check = confirm('Are you sure you want to quick sell everything?');
-            if (check) {
-                quickSellAll(items);
-            } else { promptOptions(items); }
-        } else if (input == "ONE") {
-            quickSell(items);
-        } else if (input == "EXIT") {
-            alert("!Script Aborted!");
-        } else { promptOptions(items); }
+    function addToArray(id) {
+        let itemName = document.getElementById('itemCardinventory_' + id).innerHTML.split('<')[0];
+        excludedNamesA1.push(itemName);
+        excludedNamesA1ItemColors.push(document.getElementById('itemCardinventory_' + id).style.color);
+        console.log(excludedNamesA1);
+        console.log(excludedNamesA1ItemColors);
+        console.log('sucsess' + id);
+        document.getElementById('itemCardinventory_' + id).style.color = 'green';
+        document.getElementById('itemCardinventory_' + id).style.border = "5px solid green";
+        setUncheck(id);
+    }
+
+    function removeFromArray(id) {
+        let itemName = document.getElementById('itemCardinventory_' + id).innerHTML.split('<')[0];
+        const index = excludedNamesA1.indexOf(itemName);
+        document.getElementById('itemCardinventory_' + id).style.color = excludedNamesA1ItemColors[index];
+        document.getElementById('itemCardinventory_' + id).style.border = "5px solid " + excludedNamesA1ItemColors[index];
+        if (index > -1) {
+            excludedNamesA1.splice(index, 1);
+            excludedNamesA1ItemColors.splice(index, 1);
+        }
+        setCheck(id);
+    }
+
+    function setCheck(id) {
+        document.getElementById('itemCardinventory_' + id).querySelector('.cardActions').getElementsByClassName('cardAction')[2].onclick = function() { addToArray(id) };
+    }
+
+    function setUncheck(id) {
+        document.getElementById('itemCardinventory_' + id).querySelector('.cardActions').getElementsByClassName('cardAction')[2].onclick = function() { removeFromArray(id) };
     }
 
     function timer(ms) {
@@ -43,7 +98,7 @@
     }
 
     function isExcluded(array) {
-        if (excludedRarity.includes(array[1]) || excludedNames.includes(array[0])) {
+        if (excludedRarity.includes(array[1]) || excludedNames.includes(array[0]) || excludedNamesA1.includes(array[0]) || twitchItems.includes(array[0])) {
             return true;
         } else { return false; }
     }
@@ -56,8 +111,8 @@
     }
 
     function howRare(itemNumber) {
-        let colors = ["rgb(41, 41, 41)", "rgb(237, 66, 66)", "rgb(251, 192, 45)", "rgb(224, 64, 251)", "rgb(33, 150, 243)", "rgb(178, 242, 82)"];
-        let rarities = ['contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon"];
+        let colors = ["rgb(41, 41, 41)", "rgb(237, 66, 66)", "rgb(251, 192, 45)", "rgb(224, 64, 251)", "rgb(33, 150, 243)", "rgb(178, 242, 82)", "green"];
+        let rarities = ['contraband', 'relic', 'legendary', 'epic', 'rare', "uncommon", "excluded"];
         for (let i = 0; i < rarities.length; i++) {
             let itemColor = document.getElementById('itemCardinventory_' + itemNumber).style.color;
             const rarityInfo = [rarities[i], itemColor, itemNumber]; // Ex. ["relic", "rgb(237, 66, 66)", 6]
@@ -88,7 +143,7 @@
                     await sellItem(i, 250);
                 }
             }
-        } alert("DONE!");
+        } alert("DONE! Please Reload");
     }
 
     async function quickSell(items) {
@@ -97,21 +152,27 @@
             if (document.getElementById('itemCardinventory_' + i)) {
                 const itemInfo = getItemInfo(i);
                 if (!isExcluded(itemInfo)) {
+                    document.getElementById('itemCardinventory_' + i).style.color = 'crimson';
+                    document.getElementById('itemCardinventory_' + i).style.border = "5px solid crimson";
+                    await timer(20);
                     let confirmSell = confirm("Sell " + itemInfo[0] + ", it is " + itemInfo[1]);
                     if (confirmSell && itemsSold >= 1) {
                         await sellItem(i, 20);
                         while (true) {
                             if (document.getElementById('popupContent').querySelector('div').querySelector('div').className != "lds-ring") {
-                                timer(20);
+                                timer(10);
                                 break;
                             } else { await timer(20); }
                         }
                     } else if (confirmSell && itemsSold == 0) {
                         itemsSold++
                         await sellItem(i, 250);
+                    } else {
+                        document.getElementById('itemCardinventory_' + i).style.color = 'green';
+                        document.getElementById('itemCardinventory_' + i).style.border = "5px solid green";
                     }
                 }
             }
-        } alert("DONE!");
+        } alert("DONE! Please Reload");
     }
 })();
