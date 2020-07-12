@@ -45,7 +45,7 @@
             document.getElementById('m_trades').onclick = function() { quickSellAll(items); };
 
             //Create Selection
-            for (let i = 0; i < 1000; i++) {
+            for (let i = 0; i < 2000; i++) {
                 if (document.getElementById('itemCardinventory_' + i)) {
                     if (isExcluded(getItemInfo(i))) {
                         document.getElementById('itemCardinventory_' + i).querySelector('.cardActions').getElementsByClassName('cardAction')[0].innerHTML = "Excluded";
