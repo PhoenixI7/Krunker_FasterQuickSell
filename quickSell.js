@@ -5,7 +5,7 @@
 // @description  Script for faster quick selling!
 // @author       Phoenixi7
 // @iconURL      https://phoenixpwn.com/phoenix.png
-// @match        https://krunker.io/social.html?p=market
+// @match        *://krunker.io/social.html?*
 // @grant        none
 // ==/UserScript==
 
